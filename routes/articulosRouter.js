@@ -2,6 +2,35 @@ const express = require("express");
 const router = express.Router();
 const db = require("../base-orm/sequelize-init");
 const { Op, ValidationError } = require("sequelize");
+const auth = require("../seguridad/auth");
+
+//------------------------------------
+//--------- GET con SEGURIDAD --------
+//------------------------------------
+router.get("/api/articulosJWT", auth.authenticateJWT, async function (req, res, next) {
+    // 'obtiene todos los Artículos, con seguridad JWT, solo para rol: admin (usuario:admin, clave:123)'
+    const { rol } = res.locals.user;
+    if (rol !== "admin") {
+      return res.status(403).json({ message: "usuario no autorizado!" });
+    }
+
+    let items = await db.articulos.findAll({
+      attributes: [
+        "IdArticulo",
+        "Nombre",
+        "Precio",
+        "CodigoDeBarra",
+        "IdArticuloFamilia",
+        "Stock",
+        "FechaAlta",
+        "Activo",
+      ],
+      order: [["Nombre", "ASC"]],
+    });
+    res.json(items);
+  }
+);
+
 
 router.get("/api/articulos", async function (req, res, next) {
   let where = {};
@@ -78,31 +107,6 @@ router.post("/api/articulos/", async (req, res) => {
 
 router.put("/api/articulos/:id", async (req, res) => {
   try {
-    // let item = await db.articulos.findOne({
-    //   attributes: [
-    //     "IdArticulo",
-    //     "Nombre",
-    //     "Precio",
-    //     "CodigoDeBarra",
-    //     "IdArticuloFamilia",
-    //     "Stock",
-    //     "FechaAlta",
-    //     "Activo",
-    //   ],
-    //   where: { IdArticulo: req.params.id },
-    // });
-    // if (!item) {
-    //   res.status(404).json({ message: "Artículo no encontrado" });
-    //   return;
-    // }
-    // item.Nombre = req.body.Nombre;
-    // item.Precio = req.body.Precio;
-    // item.CodigoDeBarra = req.body.CodigoDeBarra;
-    // item.IdArticuloFamilia = req.body.IdArticuloFamilia;
-    // item.Stock = req.body.Stock;
-    // item.FechaAlta = req.body.FechaAlta;
-    // item.Activo = req.body.Activo;
-    // await item.save();
     let data = await db.articulos.update(
       {
         Nombre: req.body.Nombre,

@@ -1,10 +1,12 @@
 const express = require('express');
 const app = express();
+const seguridadRouter = require("./routes/seguridadRouter");
 const articulosFamiliaRouter = require("./routes/articulosFamiliaRouter");
 const articulosRouter = require("./routes/articulosRouter");
 
 app.use(express.json()); 
 require("./base-orm/sqlite-init");
+app.use(seguridadRouter);
 app.use(articulosFamiliaRouter);
 app.use(articulosRouter);
 

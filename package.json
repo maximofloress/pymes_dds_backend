@@ -13,6 +13,7 @@
   "dependencies": {
     "aa-sqlite": "^1.0.29",
     "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
     "sequelize": "^6.37.3",
     "sqlite3": "^5.1.7"
   },
